@@ -7,12 +7,25 @@ using AForge.Genetic;
 
 namespace GenSupervisedLearning
 {
-    public class WAPChromosome : BinaryChromosome
+    public class WAPChromosome : ShortArrayChromosome
     {
-        public WAPChromosome()
-            : base(8)
-        {
+        private int nRules;
 
+        public int numRules
+        {
+            get { return nRules; }
+        }
+
+        public WAPChromosome(int length)
+            : base(length, 1)
+        {
+            if (length % 44 != 0) throw new Exception("Tamaño invalido para un cromosoma, debe ser multiplo de 44.");
+            nRules = length / 44;
+        }
+
+        public override void Crossover(IChromosome pair)
+        {
+            
         }
     }
 }

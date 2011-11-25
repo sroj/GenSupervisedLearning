@@ -1,0 +1,11 @@
+C:\Users\sroj\Documents\Visual Studio 2010\Projects\GenSupervisedLearning\GenSupervisedLearning\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\sroj\Documents\Visual Studio 2010\Projects\GenSupervisedLearning\GenSupervisedLearning\bin\Debug\GenSupervisedLearning.exe
+C:\Users\sroj\Documents\Visual Studio 2010\Projects\GenSupervisedLearning\GenSupervisedLearning\bin\Debug\GenSupervisedLearning.pdb
+C:\Users\sroj\Documents\Visual Studio 2010\Projects\GenSupervisedLearning\GenSupervisedLearning\bin\Debug\AForge.Genetic.dll
+C:\Users\sroj\Documents\Visual Studio 2010\Projects\GenSupervisedLearning\GenSupervisedLearning\bin\Debug\AForge.Math.dll
+C:\Users\sroj\Documents\Visual Studio 2010\Projects\GenSupervisedLearning\GenSupervisedLearning\bin\Debug\AForge.dll
+C:\Users\sroj\Documents\Visual Studio 2010\Projects\GenSupervisedLearning\GenSupervisedLearning\bin\Debug\AForge.Genetic.xml
+C:\Users\sroj\Documents\Visual Studio 2010\Projects\GenSupervisedLearning\GenSupervisedLearning\bin\Debug\AForge.Math.xml
+C:\Users\sroj\Documents\Visual Studio 2010\Projects\GenSupervisedLearning\GenSupervisedLearning\bin\Debug\AForge.xml
+C:\Users\sroj\Documents\Visual Studio 2010\Projects\GenSupervisedLearning\GenSupervisedLearning\obj\x86\Debug\GenSupervisedLearning.exe
+C:\Users\sroj\Documents\Visual Studio 2010\Projects\GenSupervisedLearning\GenSupervisedLearning\obj\x86\Debug\GenSupervisedLearning.pdb
