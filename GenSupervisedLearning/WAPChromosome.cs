@@ -9,6 +9,7 @@ namespace GenSupervisedLearning
 {
     public class WAPChromosome : ShortArrayChromosome
     {
+        public static int Size = 44;
         private int nRules;
         private static int RULE_LENGTH = 44;
 
@@ -20,12 +21,22 @@ namespace GenSupervisedLearning
         public WAPChromosome(int length)
             : base(length, 1)
         {
-            if (length % 44 != 0) throw new Exception("Tamaño invalido para un cromosoma, debe ser multiplo de 44.");
-            nRules = length / 44;
+            if (length % Size != 0) throw new Exception("Tamaño invalido para un cromosoma, debe ser multiplo de 44.");
+            nRules = length / Size;
+        }
+
+
+        /* Initializes a new instance of the WAPChromosome class.
+         * This is a copy constructor, which creates the exact copy of specified chromosome.
+         */
+        protected WAPChromosome(WAPChromosome source) : base(source)
+        {
+            maxValue = source.maxValue;
         }
 
         public override void Crossover(IChromosome pair)
         {
+
             Console.WriteLine("En metodo Crossover correcto");
 
             //Arreglos originales antes de hacer crossover
@@ -122,7 +133,24 @@ namespace GenSupervisedLearning
             this.length = XthisArraySize;
 
             ((WAPChromosome)pair).val = XpairArray;
-            ((WAPChromosome)pair).length = XpairArraySize;
+            ((WAPChromosome)pair).length = XpairArraySize;            
+        }
+
+        public override IChromosome CreateNew()
+        {
+            WAPChromosome n = new WAPChromosome(length);
+            return n;
+        }
+        
+        public override IChromosome Clone()
+        {
+            return new WAPChromosome(this);
+        }
+
+        //Hacer que imprima cada regla por separado.
+        public override string ToString()
+        {
+            return base.ToString();
         }
     }
 }
