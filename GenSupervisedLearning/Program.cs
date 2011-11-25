@@ -43,17 +43,20 @@ namespace GenSupervisedLearning
                 IFitnessFunction f = new FitnessFunction(examples, false);
                 ISelectionMethod roulette = new RouletteWheelSelection();
                 ISelectionMethod rank = new RankSelection();
-                IChromosome c = new WAPChromosome(44);
-                Population pop = new Population(500, c, f, roulette);
-                for (int i = 0; i < maxIter; i++)
-                    pop.RunEpoch();
-                Console.WriteLine(pop.BestChromosome);
-                Console.WriteLine(pop.BestChromosome.Fitness);
-                Console.WriteLine(Math.Sqrt(pop.BestChromosome.Fitness));
+                IChromosome c = new WAPChromosome(44 * 2);
+                IChromosome c1 = new WAPChromosome(44 * 2);
+                Console.WriteLine(c);
+                Console.WriteLine(c1);
+                c.Crossover(c1);
+                /*
+            Population pop = new Population(500, c, f, roulette);
+            for (int i = 0; i < maxIter; i++)
+                pop.RunEpoch();
+            Console.WriteLine(pop.BestChromosome);
+            Console.WriteLine(pop.BestChromosome.Fitness);
+            Console.WriteLine(Math.Sqrt(pop.BestChromosome.Fitness));            
+                  */
 
-                
-                
-                
             }
             catch (Exception e)
             {

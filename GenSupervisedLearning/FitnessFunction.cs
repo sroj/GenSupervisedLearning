@@ -23,7 +23,7 @@ namespace GenSupervisedLearning
         }
 
         public double Evaluate(IChromosome c)
-        {            
+        {
             int classified = 0;
             int[] example;
             ushort[] hypothesis = ((ShortArrayChromosome)c).Value;
@@ -33,7 +33,7 @@ namespace GenSupervisedLearning
             for (int i = 0; i < trainingSet.Length; i++)
             {
                 example = trainingSet[i];
-                
+
                 for (int j = 0; j < numRules; j++)
                 {
                     //Penalizacion por postcondicion semánticamente incorrecta.
