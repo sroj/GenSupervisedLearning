@@ -10,7 +10,7 @@ namespace GenSupervisedLearning
     {
 
         private int[][] trainingSet;
-        private bool p;
+        private bool lengthPunishment;
         private int trainingSetSize;
         private const int MIN_AGE = 15;
 
@@ -18,7 +18,7 @@ namespace GenSupervisedLearning
         public FitnessFunction(int[][] trainingSet, bool lengthPunishment)
         {
             this.trainingSet = trainingSet;
-            this.p = lengthPunishment;
+            this.lengthPunishment = lengthPunishment;
             this.trainingSetSize = trainingSet.Length;
         }
 
@@ -28,7 +28,7 @@ namespace GenSupervisedLearning
             int[] example;
             ushort[] hypothesis = ((ShortArrayChromosome)c).Value;
             bool preOK;
-            int numRules = ((ShortArrayChromosome)c).Length / WAPChromosome.Size;
+            int numRules = ((ShortArrayChromosome)c).Length / WAPChromosome.RULE_LENGTH;
 
             for (int i = 0; i < trainingSet.Length; i++)
             {
@@ -37,7 +37,7 @@ namespace GenSupervisedLearning
                 for (int j = 0; j < numRules; j++)
                 {
                     //Indice base de la regla actual:
-                    int b = j * WAPChromosome.Size;
+                    int b = j * WAPChromosome.RULE_LENGTH;
                     //Penalizacion por postcondicion semánticamente incorrecta.
                     if (hypothesis[41 + b] + hypothesis[42 + b] + hypothesis[43 + b] != 1)
                         return 0.00000001;
@@ -107,7 +107,8 @@ namespace GenSupervisedLearning
                         }
                 }
             }
-            return Math.Pow((double)classified / (double)trainingSetSize, 2);
+            double lp = (lengthPunishment ? (double)((WAPChromosome)c).numRules / (double)trainingSetSize : 0.0);
+            return Math.Pow(Math.Max((double)classified / (double)trainingSetSize - lp/2.0 , 0.0), 2);
         }
     }
 }

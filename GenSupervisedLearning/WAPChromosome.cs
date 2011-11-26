@@ -9,9 +9,8 @@ namespace GenSupervisedLearning
 {
     public class WAPChromosome : ShortArrayChromosome
     {
-        public static int Size = 44;
+        public static int RULE_LENGTH = 44;
         private int nRules;
-        private static int RULE_LENGTH = 44;
 
         public int numRules
         {
@@ -21,8 +20,8 @@ namespace GenSupervisedLearning
         public WAPChromosome(int length)
             : base(length, 1)
         {
-            if (length % Size != 0) throw new Exception("Tamaño invalido para un cromosoma, debe ser multiplo de 44.");
-            nRules = length / Size;
+            if (length % RULE_LENGTH != 0) throw new Exception("Tamaño invalido para un cromosoma, debe ser multiplo de 44.");
+            nRules = length / RULE_LENGTH;
         }
 
 
@@ -32,17 +31,16 @@ namespace GenSupervisedLearning
         protected WAPChromosome(WAPChromosome source) : base(source)
         {
             maxValue = source.maxValue;
+            nRules   = source.nRules;
         }
 
         public override void Crossover(IChromosome pair)
         {
-
-            Console.WriteLine("En metodo Crossover correcto");
+            WAPChromosome wap_pair = (WAPChromosome)pair;
 
             //Arreglos originales antes de hacer crossover
-            ushort[] pairArray = ((WAPChromosome)pair).val;
-            ushort[] thisArray = this.val;
-
+            ushort[] pairArray = wap_pair.Value;
+            ushort[] thisArray = this.Value;
             //Arreglos resultantes despues de hacer crossover
             ushort[] XpairArray;
             ushort[] XthisArray;
@@ -50,90 +48,63 @@ namespace GenSupervisedLearning
             //Puntos de crossover en el cromosoma this
             int n0 = rand.Next(1, thisArray.Length);
             int n1 = rand.Next(1, thisArray.Length);
-
-            //Puntos de crossover en el cromosoma pair
-            int p0;
-            int p1;
+            n0 = Math.Min(n0, n1);
+            n1 = Math.Max(n0, n1);
 
             //Distancias al inicio de la regla inmediata a la izquierda (ver Mitchell)
-            int d0;
-            int d1;
+            int d0 = n0 % RULE_LENGTH;
+            int d1 = n1 % RULE_LENGTH;
 
-            if (n0 > n1)
-            {
-                int swap = n0;
-                n0 = n1;
-                n1 = swap;
-            }
+            //Regla inicial y regla final en las cuales se picarán los cromosomas:
+            int ini_rule = rand.Next(0, wap_pair.nRules);
+            int fin_rule = rand.Next(0, wap_pair.nRules);
+            ini_rule = Math.Min(ini_rule, fin_rule);
+            fin_rule = Math.Max(ini_rule, fin_rule);
 
-            d0 = n0 % RULE_LENGTH;
-            d1 = n1 % RULE_LENGTH;
-            List<KeyValuePair<int, int>> lista = new List<KeyValuePair<int, int>>();
-            int i = d0;
-            int j;
-            int k = 0, l = 0;
-
-            //Calculo de todos los pares validos en cromosoma pair (ver Mitchell)
-            while (i < pairArray.Length)
-            {
-                j = d1 + k * RULE_LENGTH;
-                l = k;
-                while (j < pairArray.Length)
-                {
-                    lista.Add(new KeyValuePair<int, int>(i, j));
-                    j += RULE_LENGTH;
-                }
-                i += RULE_LENGTH;
-                ++k;
-            }
-
-            KeyValuePair<int, int> pairCrossoverPoints = lista.ElementAt(rand.Next(0, lista.Count));
-            p0 = pairCrossoverPoints.Key;
-            p1 = pairCrossoverPoints.Value;
+            //Puntos de crossover en el cromosoma pair (p0 puede ser mayor que p1)
+            int p0 = ini_rule * RULE_LENGTH + d0;
+            int p1 = fin_rule * RULE_LENGTH + d1;
+            bool inv = p0 >= p1;
 
             //Usando n0, n1, p0 y p1 hacer efectivamente el crossover entre this y pair
-            int XthisArraySize = n0 + p1 - p0 + thisArray.Length - n1;
-            int XpairArraySize = p0 + n1 - n0 + pairArray.Length - p1;
-            XthisArray = new ushort[XthisArraySize];
-            XpairArray = new ushort[XpairArraySize];
-
-            //Creacion de XthisArray
-            int offset = 0;
-            for (int n = 0; n < XthisArraySize; n++)
+            int pair_cs = p1 - p0 + (inv? RULE_LENGTH : 0);
+            XthisArray = new ushort[n0 + pair_cs + (thisArray.Length - n1)];
+            XpairArray = new ushort[pairArray.Length - (p1 - p0) + (n1 - n0)];
+            
+            try
             {
-                if (n < n0)
-                    XthisArray[n] = thisArray[n];
-                else if (n >= p0 && n < p1)
-                    XthisArray[n] = pairArray[n + p0 - 1];
-                else
+                //Aisgnacion a el arreglo de este cromosoma:
+                Array.Copy(thisArray, 0, XthisArray, 0, n0);
+                if (inv)
                 {
-                    XthisArray[n] = thisArray[n1 - 1 + offset];
-                    offset++;
+                    Array.Copy(pairArray, p0, XthisArray, n0, RULE_LENGTH - d0);
+                    Array.Copy(pairArray, p1 - d1, XthisArray, n0 + RULE_LENGTH - d0, d1);
                 }
+                else
+                    Array.Copy(pairArray, p0, XthisArray, n0, pair_cs);
+                Array.Copy(thisArray, n1, XthisArray, n0 + pair_cs, thisArray.Length - n1);
+
+                //Aisgnacion a el arreglo del cromosoma par:
+                Array.Copy(pairArray, 0, XpairArray, 0, p0);
+                Array.Copy(thisArray, n0, XpairArray, p0, (n1 - n0));
+                Array.Copy(pairArray, p1, XpairArray, p0 + (n1 - n0), pairArray.Length - p1);
+            }
+            catch (ArgumentException e)
+            {
+                Console.WriteLine("n0:{0}, n1:{1}, d0:{2}, d1:{3}, p0:{4}, p1:{5}, pcs:{6}.", n0, n1, d0, d1, p0, p1, pair_cs);
+                Console.WriteLine("XthisArrayL:{0}, XpairArrayL:{1}.", XthisArray.Length, XpairArray.Length);
+                throw e;
             }
 
-            //Creacion de XpairArray
-            offset = 0;
-            for (int n = 0; n < XpairArraySize; n++)
-            {
-                if (n < p0)
-                    XpairArray[n] = pairArray[n];
-                else if (n >= n0 && n < n1)
-                    XpairArray[n] = thisArray[n + n0 - 1];
-                else
-                {
-                    XpairArray[n] = pairArray[p1 - 1 + offset];
-                    offset++;
-                }
-            }
+            this.setValue(XthisArray);
+            wap_pair.setValue(XpairArray);
+        }
 
-            //Falta revisar si no hace daño acceder directamente
-            //a la representacion de WAPChromosome
-            this.val = XthisArray;
-            this.length = XthisArraySize;
-
-            ((WAPChromosome)pair).val = XpairArray;
-            ((WAPChromosome)pair).length = XpairArraySize;            
+        protected void setValue(ushort[] value)
+        {
+            val = value;
+            length = value.Length;
+            nRules = length / RULE_LENGTH;
         }
 
         public override IChromosome CreateNew()
@@ -150,7 +121,33 @@ namespace GenSupervisedLearning
         //Hacer que imprima cada regla por separado.
         public override string ToString()
         {
-            return base.ToString();
+            StringBuilder sb = new StringBuilder(length + numRules);
+            for (int r = 0; r < numRules; r++)
+            {
+                for (int i = 0; i < RULE_LENGTH; i++)
+                {
+                    sb.Append(val[r*RULE_LENGTH + i]);
+                }
+                sb.Append(' ');
+            }
+            return sb.ToString();
+        }
+
+        public string StringMarcas(int m0, int m1)
+        {
+            StringBuilder sb = new StringBuilder(length + numRules + 2);
+            for (int r = 0; r < numRules; r++)
+            {
+                for (int i = 0; i < RULE_LENGTH; i++)
+                {
+                    int index = r * RULE_LENGTH + i;
+                    if (index == m1) sb.Append(']');
+                    if (index == m0) sb.Append('[');
+                    sb.Append(val[index]);
+                }
+                sb.Append(' ');
+            }
+            return sb.ToString();
         }
     }
 }
