@@ -64,15 +64,16 @@ namespace GenSupervisedLearning
                 }
                 //Console.WriteLine(pop.BestChromosome);
                 Console.WriteLine("Mejor Cromosoma de la ultima generacion:");
-                Console.WriteLine(pop.BestChromosome.Fitness);
-                Console.WriteLine(Math.Sqrt(pop.BestChromosome.Fitness) + (double)((WAPChromosome)pop.BestChromosome).numRules / (double)examples.Length / 2.0);
-
+                Console.WriteLine("Fitness {0}", pop.BestChromosome.Fitness);
+                Console.WriteLine("Clasificados {0}", Math.Sqrt(pop.BestChromosome.Fitness) + (double)((WAPChromosome)pop.BestChromosome).numRules / (double)examples.Length / 2.0);
+                Console.WriteLine("Reglas {0}", ((WAPChromosome)pop.BestChromosome).numRules); 
 
                 //Console.WriteLine(legend);
                 Console.WriteLine("\nMejor Cromosoma de todas las generaciones:");
-                Console.WriteLine(legend.Fitness);
-                Console.WriteLine(Math.Sqrt(legend.Fitness) + (double)((WAPChromosome)legend).numRules / (double)examples.Length / 2.0); 
-                
+                Console.WriteLine("Fitness {0}", legend.Fitness);
+                Console.WriteLine("Clasificados {0}", Math.Sqrt(legend.Fitness) + (double)((WAPChromosome)legend).numRules / (double)examples.Length / 2.0);
+                Console.WriteLine("Reglas {0}", legend.numRules);
+                Console.WriteLine(legend);
 
             }
             catch (Exception e)

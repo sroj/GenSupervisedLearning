@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AForge.Genetic;
+using System.Threading;
 
 namespace GenSupervisedLearning
 {
-    class FitnessFunction : IFitnessFunction
+    public class FitnessFunction : IFitnessFunction
     {
 
         private int[][] trainingSet;
@@ -24,23 +25,74 @@ namespace GenSupervisedLearning
 
         public double Evaluate(IChromosome c)
         {
-            int classified = 0;
-            int[] example;
-            ushort[] hypothesis = ((ShortArrayChromosome)c).Value;
-            bool preOK;
-            int numRules = ((ShortArrayChromosome)c).Length / WAPChromosome.RULE_LENGTH;
+            WAPChromosome wapC = (WAPChromosome)c;
 
-            for (int i = 0; i < trainingSet.Length; i++)
+            //El mejor numero para dos Cores, crea 2 threads:
+            const int works = 800;
+
+            Thread[] threads = new Thread[(int)Math.Ceiling((double)trainingSet.Length / (double)works)];
+            testExamplesContext[] contexts = new testExamplesContext[threads.Length];
+
+
+            for (int t = 0; t < threads.Length; t++)
+                threads[t] = new Thread(this.testExamples);
+
+            for (int t = 0; t < threads.Length; t++)
             {
-                example = trainingSet[i];
+                contexts[t] = new testExamplesContext(wapC, t * works, Math.Min((t+1)*works, trainingSet.Length));
+                threads[t].Start(contexts[t]);
+            }
 
-                for (int j = 0; j < numRules; j++)
+            int classified = 0;
+            for (int t = 0; t < threads.Length; t++)
+            {
+                threads[t].Join();
+
+                //Penalizacion por postcondicion semánticamente incorrecta.
+                if (contexts[t].classified < 0)
+                    return 0.00000001;
+                else
+                    classified += contexts[t].classified;
+            }
+            
+            double lp = (lengthPunishment ? (double)((WAPChromosome)c).numRules / (double)trainingSetSize : 0.0);
+            return Math.Pow(Math.Max((double)classified / (double)trainingSetSize - lp / 2.0, 0.0), 2);
+        }
+
+        private class testExamplesContext
+        {
+            public WAPChromosome chromosome; public int begin; public int end; public int classified;
+            public testExamplesContext(WAPChromosome chromosome, int begin, int end)
+            {
+                this.chromosome = chromosome; this.begin = begin; this.begin = begin; this.end = end; this.classified = 0;
+            }
+        }
+
+        private void testExamples(object tec)
+        {
+            Thread.Sleep(0);
+            bool preOK;
+            testExamplesContext TEC = (testExamplesContext) tec;
+            WAPChromosome c = TEC.chromosome;
+            int begin = TEC.begin;
+            int end   = TEC.end;
+            ushort[] hypothesis = c.Value;
+
+            TEC.classified = 0;
+
+            for (int i = begin; i < end; i++)
+            {
+                int[] example = trainingSet[i];
+                for (int j = 0; j < c.numRules; j++)
                 {
                     //Indice base de la regla actual:
                     int b = j * WAPChromosome.RULE_LENGTH;
                     //Penalizacion por postcondicion semánticamente incorrecta.
                     if (hypothesis[41 + b] + hypothesis[42 + b] + hypothesis[43 + b] != 1)
-                        return 0.00000001;
+                    {
+                        TEC.classified = -1;
+                        return;
+                    }
 
                     preOK = true;
                     for (int k = 0; k < 9 && preOK; k++)
@@ -99,16 +151,19 @@ namespace GenSupervisedLearning
                     }
 
                     if (preOK)
+                    {
                         //Rango de postcondicion 41<=i<=43 con metodo = i - 40
                         if (hypothesis[40 + example[9] + b] == 1)
                         {
-                            classified++;
+                            TEC.classified++;
                             break;
                         }
-                }
-            }
-            double lp = (lengthPunishment ? (double)((WAPChromosome)c).numRules / (double)trainingSetSize : 0.0);
-            return Math.Pow(Math.Max((double)classified / (double)trainingSetSize - lp/2.0 , 0.0), 2);
+                    }
+                } //End Rules For
+            }//End examples For
         }
+
+
+
     }
 }

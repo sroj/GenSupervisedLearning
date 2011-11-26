@@ -104,7 +104,6 @@ namespace GenSupervisedLearning
 
         public override void Crossover(IChromosome pair)
         {
-            Console.WriteLine("Crosover on {0} to {1}", GetHashCode(), pair.GetHashCode());
             WAPChromosome wap_pair = (WAPChromosome)pair;
 
             //Arreglos originales antes de hacer crossover
