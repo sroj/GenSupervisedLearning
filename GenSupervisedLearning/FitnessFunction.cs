@@ -27,6 +27,8 @@ namespace GenSupervisedLearning
         {
             WAPChromosome wapC = (WAPChromosome)c;
 
+            if (wapC.numRules >= 1000) return 0.0;
+
             //El mejor numero para dos Cores, crea 2 threads:
             const int works = 800;
 
@@ -50,7 +52,7 @@ namespace GenSupervisedLearning
 
                 //Penalizacion por postcondicion semánticamente incorrecta.
                 if (contexts[t].classified < 0)
-                    return 0.00000001;
+                    return Math.Pow(0.00000001, 2);
                 else
                     classified += contexts[t].classified;
             }
@@ -156,6 +158,10 @@ namespace GenSupervisedLearning
                         if (hypothesis[40 + example[9] + b] == 1)
                         {
                             TEC.classified++;
+                            break;
+                        }
+                        else
+                        {
                             break;
                         }
                     }

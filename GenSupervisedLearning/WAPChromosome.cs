@@ -183,7 +183,8 @@ namespace GenSupervisedLearning
         
         public override IChromosome Clone()
         {
-            return new WAPChromosome(this);
+            WAPChromosome r = new WAPChromosome(this);
+            return r;
         }
 
         //Hacer que imprima cada regla por separado.
