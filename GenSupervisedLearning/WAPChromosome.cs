@@ -34,8 +34,77 @@ namespace GenSupervisedLearning
             nRules   = source.nRules;
         }
 
+        public virtual void DropCondition()
+        {
+            int rule = rand.Next(0, nRules);
+            int atribute = rand.Next(0, 9);
+            int begin = 0, end = 0;
+
+            switch (atribute)
+            {
+                case 0:
+                    end = 8;
+                    break;
+                case 1:
+                    begin = 8;
+                    end = 12;
+                    break;
+                case 2:
+                    begin = 12;
+                    end = 16;
+                    break;
+                case 3:
+                    begin = 16;
+                    end = 27;
+                    break;
+                case 4:
+                    begin = 27;
+                    end = 29;
+                    break;
+                case 5:
+                    begin = 29;
+                    end = 31;
+                    break;
+                case 6:
+                    begin = 31;
+                    end = 35;
+                    break;
+                case 7:
+                    begin = 35;
+                    end = 39;
+                    break;
+                case 8:
+                    begin = 39;
+                    end = 41;
+                    break;
+            }
+
+            int b = rule * RULE_LENGTH;
+            for (; begin < end; begin++)
+            {
+                val[b + begin] = 1;
+            }
+        }
+
+        public virtual void AddAlternative()
+        {
+            int index = rand.Next(0, length);
+            int mod, real_index;
+            for (int i = 0; i < length; i++, index++)
+            {
+                mod = index % RULE_LENGTH;
+                real_index = index % length;
+                if (mod < 41 && val[real_index] == 0)
+                {
+                    val[real_index] = 1;
+                    break;
+                }
+            }
+        }
+
         public override void Crossover(IChromosome pair)
         {
+            Console.WriteLine("Crosover on {0} to {1}", GetHashCode(), pair.GetHashCode());
             WAPChromosome wap_pair = (WAPChromosome)pair;
 
             //Arreglos originales antes de hacer crossover

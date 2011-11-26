@@ -45,9 +45,11 @@ namespace GenSupervisedLearning
                 ISelectionMethod rank = new RankSelection();
                 WAPChromosome c = new WAPChromosome(5 * 44);
                 WAPChromosome legend = c;
-                Population pop = new Population(50, c, f, roulette);
+                WAPPopulation pop = new WAPPopulation(10, c, f, roulette);
                 pop.RandomSelectionPortion = 0.2;
                 pop.MutationRate = 0.0;
+                pop.parallelism = true;
+
                 Console.WriteLine("Entrenando: selectP:{0} mutacion:{1}", pop.RandomSelectionPortion, pop.MutationRate);
                 for (int i = 0; i < maxIter; i++)
                 {
@@ -70,7 +72,7 @@ namespace GenSupervisedLearning
                 Console.WriteLine("\nMejor Cromosoma de todas las generaciones:");
                 Console.WriteLine(legend.Fitness);
                 Console.WriteLine(Math.Sqrt(legend.Fitness) + (double)((WAPChromosome)legend).numRules / (double)examples.Length / 2.0); 
-
+                
 
             }
             catch (Exception e)
